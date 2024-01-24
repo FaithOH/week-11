@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jokes Page - Page 2</title>
+    <style>
+        /*DOM Manipulation: whenever you click "Laugh More," you get a new joke, the background color changes, and the text color adjusts based on the background luminance to make sure everything looks good.
+        Nice CSS styles: I used square shapes and positioned around the canvas. Then i blurred the background to give that blob-like gradients. I also added animations to add to the nice styling
+        API request to third-party site: My code uses the JokeAPI to fetch random jokes.
+*/
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400;6..12,500;6..12,600;6..12,700&display=swap');
+     *{
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+
+     }
+     html{
+    font-family: 'Inter', sans-serif;
+}
+     body{
+        overflow: hidden;
+     }
+     section{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(to bottom, rgb(84, 250, 203), rgb(181, 1, 252));
+     }
+     section .blob{
+        position: absolute;
+        filter: blur(150px);
+     }
+     section .blob:nth-child(1){
+      top: -350px;
+      width: 600px;
+      height: 600px;
+      background: #e851b3;
+
+     }
+     section .blob:nth-child(2){
+        bottom: -150px;
+      left: 100px;
+      width: 500px;
+      height: 500px;
+      background: #fcf804;
+     
+     }
+     section .blob:nth-child(3){
+      bottom: 50px;
+      left: 100px;
+      width: 300px;
+      height: 300px;
+      background: #ffffff;
+     
+     }
+     section .blob:nth-child(4){
+      bottom: 150px;
+      left: 500px;
+      width: 300px;
+      height: 300px;
+      background: #5483f9;
+      animation: shiftToLeft 2s ease-in 0s infinite normal;
+     }
+     section .blob:nth-child(5){
+      right: -400px;
+      width: 300px;
+      height: 300px;
+      background: #ffffff;
+     animation: rotate 1s linear infinite 5s;
+     transform-origin: top left;
+     }
+     @keyframes shiftToLeft{
+     from{transform: translateX(-400px);}
+     to{transform: translateX(0);}
+     }
+     @keyframes rotate{
+     from{transform: rotate(0);}
+     to{transform: rotate(360deg);}
+     }
+     .card{
+        position: relative;
+     }
+     .card-container{
+        width: 400px;
+        min-height: 400px;
+        position: relative;
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        backdrop-filter: blur(15px);
+     }
+     .card-content {
+        color: white;
+        text-align: center;
+        padding: 20px;
+        margin: 3rem;
+     }
+   
+     button{
+        text-decoration: none;
+        padding: 10px;
+        border-radius: 4px;
+        border: none;   
+        margin-left: 150px;
+        margin-bottom: 30px;
+        cursor: pointer;
+        transition: all 0.9s ease;
+        font-weight: bold;
+        background-color:rgb(255, 213, 0) ;
+        color: rgb(33, 32, 32);
+}
+button:hover{
+    background-color:  rgb(254, 42, 0);
+    color: white;
+    transform: translateY(-6px)translateX(5px);
+}
+.card-content p{
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 25px;
+
+}
+
+    </style>
+</head>
+<body>
+    <section>
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="card">
+            <div class="card-container">
+                <div class="card-content">
+                <p id="funny"></p>
+                </div>
+                <button id="cta">Laugh More</button>
+            </div>
+        </div>
+    </section>
+   <script>
+    const jokeWrapper = document.getElementById("funny");
+const button = document.getElementById("cta");
+const section = document.querySelector("section");
+const url = 'https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,religious,political,racist,sexist,explicit';
+
+let getFunny = () => {
+    fetch(url)
+        .then(data => data.json())
+        .then(item => {
+            if (item.type === 'single') {
+                jokeWrapper.textContent = `${item.joke}`;
+            } else if (item.type === 'twopart') {
+                jokeWrapper.textContent = `${item.setup} ${item.delivery}`;
+            }
+
+            
+            const randomColor = getRandomColor();
+            section.style.background = randomColor;
+
+            
+            const textColor = getTextColor(randomColor);
+            jokeWrapper.style.color = textColor;
+        });
+}
+
+button.addEventListener("click", getFunny);
+getFunny();
+
+
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+
+function getTextColor(backgroundColor) {
+    const hexColor = backgroundColor.slice(1); 
+    const r = parseInt(hexColor.substr(0, 2), 16);
+    const g = parseInt(hexColor.substr(2, 2), 16);
+    const b = parseInt(hexColor.substr(4, 2), 16);
+
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    return luminance > 0.5 ? 'black' : 'white';
+}
+
+   </script>
+</body>
+</html>
